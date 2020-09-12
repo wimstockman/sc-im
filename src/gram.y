@@ -120,6 +120,7 @@ token S_YANKCOL
 %token S_SEVAL
 %token S_ERROR
 %token S_FILL
+%token S_STRTONUM
 /*
  token S_ADDNOTE
  token S_DELNOTE
@@ -234,6 +235,8 @@ token S_YANKCOL
 %token K_NONUMERIC_DECIMAL
 %token K_NUMERIC_ZERO
 %token K_NONUMERIC_ZERO
+%token K_FILENAME_WITH_MODE
+%token K_NOFILENAME_WITH_MODE
 %token K_OVERLAP
 %token K_NOOVERLAP
 %token K_TRUNCATE
@@ -582,6 +585,7 @@ command:
  //   |    S_GOTO WORD             { /* don't repeat last goto on "unintelligible word" */ ; }
 
     |    S_CCOPY range           { copy_to_clipboard($2.left.vp->row, $2.left.vp->col, $2.right.vp->row, $2.right.vp->col); }
+|    S_STRTONUM range           {  convert_string_to_number($2.left.vp->row, $2.left.vp->col, $2.right.vp->row, $2.right.vp->col); } 
     |    S_CPASTE                { paste_from_clipboard(); }
     |    S_LOCK var_or_range     { lock_cells($2.left.vp, $2.right.vp); }
     |    S_UNLOCK var_or_range   { unlock_cells($2.left.vp, $2.right.vp); }
@@ -1045,10 +1049,16 @@ setlist :
 
 /* things that you can 'set' */
 setitem :
-         K_OVERLAP '=' NUMBER     {  if ($3 == 0) parse_str(user_conf_d, "overlap=0", TRUE);
+         K_FILENAME_WITH_MODE '=' NUMBER {  if ($3 == 0) parse_str(user_conf_d, "filename_with_mode=0", TRUE);
+                                     else         parse_str(user_conf_d, "filename_with_mode=1", TRUE); }
+    |    K_FILENAME_WITH_MODE     {               parse_str(user_conf_d, "filename_with_mode=1", TRUE); }
+    |    K_NOFILENAME_WITH_MODE   {               parse_str(user_conf_d, "filename_with_mode=0", TRUE); }
+
+    |    K_OVERLAP '=' NUMBER     {  if ($3 == 0) parse_str(user_conf_d, "overlap=0", TRUE);
                                      else         parse_str(user_conf_d, "overlap=1", TRUE); }
     |    K_OVERLAP                {               parse_str(user_conf_d, "overlap=1", TRUE); }
     |    K_NOOVERLAP              {               parse_str(user_conf_d, "overlap=0", TRUE); }
+
     |    K_TRUNCATE '=' NUMBER     {  if ($3 == 0) parse_str(user_conf_d, "truncate=0", TRUE);
                                      else         parse_str(user_conf_d, "truncate=1", TRUE); }
     |    K_TRUNCATE               {               parse_str(user_conf_d, "truncate=1", TRUE); }

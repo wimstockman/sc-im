@@ -661,6 +661,12 @@ Commands for handling cell content:
 
                 ":filteroff" turns off the filters.
 
+    :strtonum {range}
+                Converts string field containing digits to a numeric field.
+                So you can calculate with it. 
+                Example: 
+                label A0 = "5" -> let A0 = 5 (internal representation)
+
     :int "{string}"
                 Send a command to the interpreter.
                 Example:          :int goto B2
@@ -915,6 +921,11 @@ Commands for handling cell content:
     c-a         Moves to first cell of spreadsheet.
 
     y           Yank the selected cell or range and exit Visual mode.
+    p           Paste the previously yanked cell or range into the Visual
+                Range repeating to fill up the range
+    P           Works like 'p' except that all cell references are adjusted
+                in the same way that they are for the copy command.
+
     x , dd      Delete the current range, saving its content to the
                 yankbuffer.
     H           Move to the first row visible on screen.
@@ -1091,6 +1102,11 @@ Commands for handling cell content:
     'external_functions' [default off]
     Disabled by default, set this variable to enable external functions.  See
     @ext function below.
+
+    'filename_with_mode' [default 0]
+    Set it to '1' to display current filename along with the current mode at
+    the right end of the status line.
+    Set it to '0', to display the current mode only.
 
     'overlap' [default off]
     If cell content exceedes column width it gets cut off to fit the column
