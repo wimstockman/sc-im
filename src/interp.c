@@ -437,6 +437,43 @@ double dosum(int minr, int minc, int maxr, int maxc, struct enode * e) {
 }
 
 /**
+ * \brief TODO Document dowim()
+ *
+ * \param[in] minr
+ * \param[in] minc
+ * \param[in] maxr
+ * \param[in] maxc
+ * \param[in] e
+ *
+ * \return none
+ */
+
+double dowim(int minr, int minc, int maxr, int maxc, struct enode * e) {
+    double v;
+    int r, c;
+    int cellerr = CELLOK;
+    register struct ent * p;
+
+    v = (double)0;
+    for (r = minr; r <= maxr; r++)
+        for (c = minc; c <= maxc; c++) {
+            if (e) {
+                rowoffset = r - minr;
+                coloffset = c - minc;
+            }
+            if ( !e || eval(NULL, e))
+                if ((p = *ATBL(tbl, r, c)) && p->flags & is_valid) {
+                    if (p->cellerror)
+                        cellerr = CELLINVALID;
+                    v += p->v;
+                }
+        }
+    cellerror = cellerr;
+    rowoffset = coloffset = 0;
+    return v;
+}
+
+/**
  * \brief TODO Document doprod()
  *
  * \param[in] minr
@@ -1115,6 +1152,7 @@ double eval(register struct ent * ent, register struct enode * e) {
             return (vp->v);
             }
     case SUM:
+    case WIM:
     case PROD:
     case AVG:
     case COUNT:
@@ -1153,6 +1191,8 @@ double eval(register struct ent * ent, register struct enode * e) {
                 (int) eval(ent, e->e.o.right->e.o.right), 1);
             case INDEX:
             return doindex(minr, minc, maxr, maxc, e->e.o.right);
+                case WIM:
+            return dowim(minr, minc, maxr, maxc, e->e.o.right);
                 case SUM:
             return dosum(minr, minc, maxr, maxc, e->e.o.right);
                 case PROD:
@@ -2897,6 +2937,7 @@ void decompile(register struct enode *e, int priority) {
             break;
 
     case SUM    : index_arg("@sum", e); break;
+    case WIM    : index_arg("@wim", e); break;
     case PROD   : index_arg("@prod", e); break;
     case AVG    : index_arg("@avg", e); break;
     case COUNT  : index_arg("@count", e); break;

@@ -257,6 +257,7 @@ token S_YANKCOL
 %token K_INVALID
 %token K_FIXED
 %token K_SUM
+%token K_WIM
 %token K_PROD
 %token K_AVG
 %token K_STDDEV
@@ -797,6 +798,10 @@ term:     var                     { $$ = new_var(O_VAR, $1); }
         | '@' K_FIXED term        { $$ = new('f', $3, ENULL); }
         | '(' '@' K_FIXED ')' term
                                   { $$ = new('F', $5, ENULL); }
+        | '@' K_WIM '(' var_or_range ')'
+                                  { $$ = new(WIM, new_range(REDUCE | WIM, $4), ENULL); }
+        | '@' K_WIM  '(' range ',' e ')'
+                                  { $$ = new(WIM, new_range(REDUCE | WIM, $4), $6); }
         | '@' K_SUM '(' var_or_range ')'
                                   { $$ = new(SUM, new_range(REDUCE | SUM, $4), ENULL); }
         | '@' K_SUM  '(' range ',' e ')'
